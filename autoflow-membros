@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoFlow IA — Sua Área</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080C12;
+  --s1:#0D1219;
+  --s2:#121A24;
+  --s3:#18222E;
+  --border:#1E2D3D;
+  --border2:#243548;
+  --cyan:#00E5FF;
+  --green:#39FF6E;
+  --yellow:#FFD600;
+  --orange:#FF7A00;
+  --white:#F4F8FF;
+  --dim:#8CA0BC;
+  --dimmer:#4A5F78;
+  --red:#FF4560;
+  --font:'Plus Jakarta Sans',sans-serif;
+  --display:'Syne',sans-serif;
+  --mono:'DM Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--white);min-height:100vh;overflow-x:hidden}
+
+.layout{display:flex;min-height:100vh}
+
+/* ─── SIDEBAR ─── */
+.sidebar{
+  width:72px;flex-shrink:0;background:var(--s1);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;align-items:center;
+  padding:1.2rem 0;gap:.4rem;
+  position:sticky;top:0;height:100vh;z-index:50;
+}
+.sb-logo{font-family:var(--display);font-weight:800;font-size:.75rem;color:var(--cyan);text-align:center;padding:.4rem;line-height:1.1;margin-bottom:.4rem}
+.sb-sep{width:32px;height:1px;background:var(--border);margin:.2rem 0}
+.sb-btn{
+  width:44px;height:44px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.15rem;cursor:pointer;border:none;background:transparent;
+  transition:background .15s;position:relative;
+}
+.sb-btn:hover{background:var(--s3)}
+.sb-btn.active{background:rgba(0,229,255,.12)}
+.sb-btn.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:22px;background:var(--cyan);border-radius:0 3px 3px 0}
+.sb-tip{position:absolute;left:56px;background:var(--s3);border:1px solid var(--border2);color:var(--white);font-size:.7rem;font-weight:600;padding:.25rem .6rem;border-radius:6px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:99}
+.sb-btn:hover .sb-tip{opacity:1}
+.sb-spacer{flex:1}
+.sb-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--green));display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:800;font-size:.7rem;color:var(--bg);cursor:pointer}
+
+/* ─── MAIN ─── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+.topbar{
+  height:56px;flex-shrink:0;background:var(--s1);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.5rem;position:sticky;top:0;z-index:40;
+}
+.topbar-left{display:flex;align-items:center;gap:.8rem;min-width:0}
+.page-title{font-family:var(--display);font-size:.9rem;font-weight:700;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.plan-chip{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.18rem .6rem;border-radius:20px;border:1px solid;flex-shrink:0}
+.chip-free{border-color:var(--dimmer);color:var(--dimmer)}
+.chip-starter{border-color:var(--cyan);color:var(--cyan);background:rgba(0,229,255,.07)}
+.chip-pro{border-color:var(--green);color:var(--green);background:rgba(57,255,110,.07)}
+.chip-elite{border-color:var(--yellow);color:var(--yellow);background:rgba(255,214,0,.07)}
+.topbar-right{display:flex;align-items:center;gap:.7rem;flex-shrink:0}
+.topbar-user{font-size:.8rem;color:var(--dim)}
+.notif-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;font-size:.85rem;cursor:pointer;transition:background .15s}
+.notif-btn:hover{background:var(--s3)}
+
+.content{flex:1;overflow-y:auto;padding:1.5rem}
+.screen{display:none}
+.screen.active{display:block;animation:scIn .28s ease both}
+@keyframes scIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── WELCOME HERO ─── */
+.welcome-hero{
+  background:linear-gradient(135deg,var(--s2),rgba(0,229,255,.03));
+  border:1px solid var(--border);border-radius:14px;
+  padding:1.8rem 2rem;margin-bottom:1.2rem;position:relative;overflow:hidden;
+}
+.welcome-hero::after{content:'';position:absolute;top:-30px;right:-30px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(0,229,255,.07),transparent 70%);pointer-events:none}
+.wh-tag{display:inline-flex;align-items:center;gap:.4rem;font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan);margin-bottom:.6rem}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.welcome-hero h1{font-family:var(--display);font-size:clamp(1.3rem,2.5vw,1.8rem);font-weight:800;color:var(--white);letter-spacing:-.03em;margin-bottom:.4rem}
+.welcome-hero h1 em{font-style:normal;color:var(--cyan)}
+.welcome-hero p{font-size:.85rem;color:var(--dim);line-height:1.6;max-width:500px}
+.wh-cta{margin-top:1.1rem;display:inline-flex;align-items:center;gap:.5rem;background:var(--cyan);color:var(--bg);padding:.6rem 1.3rem;border-radius:8px;font-family:var(--display);font-size:.8rem;font-weight:800;border:none;cursor:pointer;box-shadow:0 0 20px rgba(0,229,255,.22);transition:transform .15s,box-shadow .15s}
+.wh-cta:hover{transform:translateY(-2px);box-shadow:0 0 35px rgba(0,229,255,.38)}
+
+/* ─── STATS ─── */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem;margin-bottom:1.2rem}
+.stat-card{background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:1.1rem}
+.stat-label{font-size:.65rem;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem}
+.stat-val{font-family:var(--display);font-size:1.5rem;font-weight:800;color:var(--white);letter-spacing:-.03em;line-height:1}
+.stat-sub{font-size:.7rem;color:var(--green);margin-top:.25rem;font-weight:600}
+
+/* ─── STEP TRACKER ─── */
+.tracker{background:var(--s2);border:1px solid var(--border);border-radius:14px;padding:1.4rem}
+.tracker-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem}
+.tracker-hd h2{font-family:var(--display);font-size:.95rem;font-weight:800;color:var(--white)}
+.tracker-pct{font-family:var(--mono);font-size:.75rem;color:var(--cyan)}
+.tbar{height:4px;background:var(--border);border-radius:2px;margin-bottom:1.2rem;overflow:hidden}
+.tbar-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));border-radius:2px;transition:width 1s ease}
+
+.step-rows{display:flex;flex-direction:column;gap:.4rem}
+.step-item{
+  display:flex;align-items:center;gap:.9rem;
+  padding:.95rem 1.1rem;border-radius:10px;border:1px solid var(--border);
+  cursor:pointer;transition:all .18s;position:relative;
+}
+.step-item.current{background:rgba(0,229,255,.04);border-color:rgba(0,229,255,.28)}
+.step-item.done{background:rgba(57,255,110,.02);border-color:rgba(57,255,110,.18)}
+.step-item.locked{opacity:.38;cursor:not-allowed;pointer-events:none}
+.step-item:not(.locked):not(.done):hover{background:var(--s3)}
+
+.s-ico{width:38px;height:38px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1rem;border:2px solid var(--border);background:var(--s1);transition:all .18s}
+.step-item.current .s-ico{border-color:var(--cyan);background:rgba(0,229,255,.1)}
+.step-item.done .s-ico{border-color:var(--green);background:rgba(57,255,110,.1)}
+
+.s-info{flex:1;min-width:0}
+.s-info h3{font-size:.88rem;font-weight:700;color:var(--white);margin-bottom:.15rem}
+.s-info p{font-size:.73rem;color:var(--dim);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.s-badge{font-size:.62rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:.17rem .5rem;border-radius:20px;flex-shrink:0}
+.sb-now{background:rgba(0,229,255,.15);color:var(--cyan);border:1px solid rgba(0,229,255,.3)}
+.sb-done{background:rgba(57,255,110,.12);color:var(--green);border:1px solid rgba(57,255,110,.2)}
+.sb-lock{background:rgba(74,95,120,.08);color:var(--dimmer);border:1px solid var(--border)}
+
+/* ─── SECTION LABEL ─── */
+.sec-lbl{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:.9rem;display:flex;align-items:center;gap:.6rem}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ─── METHOD HERO ─── */
+.mhero{border-radius:14px;padding:1.8rem;margin-bottom:1.2rem;position:relative;overflow:hidden}
+.mhero.c1{background:linear-gradient(135deg,rgba(0,229,255,.07),rgba(0,229,255,.02));border:1px solid rgba(0,229,255,.18)}
+.mhero.c2{background:linear-gradient(135deg,rgba(57,255,110,.07),rgba(57,255,110,.02));border:1px solid rgba(57,255,110,.18)}
+.mhero.c3{background:linear-gradient(135deg,rgba(255,214,0,.07),rgba(255,214,0,.02));border:1px solid rgba(255,214,0,.18)}
+.mhero.c4{background:linear-gradient(135deg,rgba(255,122,0,.07),rgba(255,122,0,.02));border:1px solid rgba(255,122,0,.18)}
+.mhero-top{display:flex;align-items:center;justify-content:space-between;gap.5rem;margin-bottom:.8rem}
+.mhero-step{font-family:var(--mono);font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;color:var(--dim);background:rgba(0,0,0,.25);padding:.18rem .55rem;border-radius:4px}
+.mhero-time{font-size:.7rem;font-weight:700;color:var(--green);background:rgba(57,255,110,.1);border:1px solid rgba(57,255,110,.2);padding:.18rem .55rem;border-radius:4px}
+.mhero h2{font-family:var(--display);font-size:clamp(1.1rem,2vw,1.4rem);font-weight:800;color:var(--white);margin-bottom:.4rem;letter-spacing:-.02em}
+.mhero p{font-size:.83rem;color:var(--dim);line-height:1.6;max-width:600px}
+.tools-row{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.9rem}
+.tool-tag{display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .65rem;border-radius:20px;font-size:.65rem;font-weight:600;background:var(--s1);border:1px solid var(--border2);color:var(--dim)}
+.tool-dot{width:5px;height:5px;border-radius:50%;background:var(--cyan)}
+
+/* ─── HOW GRID ─── */
+.how-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1.2rem}
+.how-card{background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:1.2rem;position:relative}
+.how-n{font-family:var(--display);font-size:2.2rem;font-weight:800;color:rgba(255,255,255,.04);line-height:1;position:absolute;top:.9rem;right:1rem;letter-spacing:-.05em}
+.how-card h4{font-size:.85rem;font-weight:700;color:var(--white);margin-bottom:.35rem}
+.how-card p{font-size:.76rem;color:var(--dim);line-height:1.6}
+.how-t{display:inline-block;margin-top:.7rem;font-family:var(--mono);font-size:.62rem;color:var(--cyan)}
+
+/* ─── SCRIPT ─── */
+.script-wrap{background:var(--s2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:1.2rem}
+.script-bar{display:flex;align-items:center;justify-content:space-between;padding:.6rem 1rem;background:var(--s1);border-bottom:1px solid var(--border)}
+.script-dots{display:flex;gap:.3rem;align-items:center}
+.sdot{width:8px;height:8px;border-radius:50%}
+.script-bar-title{font-size:.68rem;color:var(--dim);margin-left:.4rem}
+.btn-copy{padding:.28rem .75rem;border-radius:5px;background:transparent;border:1px solid var(--border2);color:var(--dim);font-size:.68rem;font-family:var(--mono);cursor:pointer;transition:all .15s}
+.btn-copy:hover{border-color:var(--cyan);color:var(--cyan)}
+.btn-copy.ok{border-color:var(--green);color:var(--green)}
+.script-body{padding:1.1rem 1.3rem;font-family:var(--mono);font-size:.78rem;color:var(--white);line-height:1.85;white-space:pre-wrap}
+.script-body mark{background:rgba(0,229,255,.13);color:var(--cyan);border-radius:3px;padding:0 .18rem;font-style:normal}
+
+/* ─── ACTION BAR ─── */
+.action-bar{display:flex;align-items:center;justify-content:space-between;background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:1.1rem 1.3rem;margin-bottom:1.2rem;flex-wrap:wrap;gap:.8rem}
+.ab-info h4{font-size:.88rem;font-weight:700;color:var(--white);margin-bottom:.15rem}
+.ab-info p{font-size:.75rem;color:var(--dim)}
+.ab-btns{display:flex;gap:.6rem;align-items:center;flex-shrink:0}
+.btn-p{display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.2rem;border-radius:8px;background:var(--cyan);color:var(--bg);font-family:var(--display);font-size:.78rem;font-weight:800;border:none;cursor:pointer;text-decoration:none;box-shadow:0 0 18px rgba(0,229,255,.2);transition:transform .15s,box-shadow .15s}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 0 28px rgba(0,229,255,.35)}
+.btn-s{display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1rem;border-radius:8px;background:transparent;color:var(--dim);font-family:var(--display);font-size:.78rem;font-weight:700;border:1px solid var(--border2);cursor:pointer;text-decoration:none;transition:border-color .15s,color .15s}
+.btn-s:hover{border-color:var(--white);color:var(--white)}
+
+/* ─── LOCK WALL ─── */
+.lock-wall{background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:2rem;text-align:center;margin-bottom:1.2rem}
+.lock-wall .lock-ico{font-size:2rem;margin-bottom:.8rem}
+.lock-wall h3{font-family:var(--display);font-size:.95rem;font-weight:800;color:var(--white);margin-bottom:.4rem}
+.lock-wall p{font-size:.8rem;color:var(--dim);margin-bottom:1rem;line-height:1.55}
+
+/* ─── NICHO GRID ─── */
+.nicho-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem;margin-bottom:1.2rem}
+.nicho-btn{background:var(--s2);border:2px solid var(--border);border-radius:12px;padding:1rem .7rem;text-align:center;cursor:pointer;transition:all .18s}
+.nicho-btn:hover{border-color:var(--cyan);background:rgba(0,229,255,.04);transform:translateY(-3px)}
+.nicho-btn.sel{border-color:var(--green);background:rgba(57,255,110,.05)}
+.ni-em{font-size:1.6rem;margin-bottom:.4rem;display:block}
+.ni-nm{font-size:.75rem;font-weight:700;color:var(--white);margin-bottom:.15rem}
+.ni-tk{font-family:var(--mono);font-size:.6rem;color:var(--dim)}
+.nicho-btn.sel .ni-nm{color:var(--green)}
+
+/* ─── UPGRADE BANNER ─── */
+.up-banner{background:linear-gradient(135deg,rgba(0,229,255,.06),rgba(57,255,110,.04));border:1px solid rgba(0,229,255,.18);border-radius:12px;padding:1.3rem;display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap;margin-top:1.2rem}
+.up-banner h3{font-family:var(--display);font-size:.9rem;font-weight:800;color:var(--white);margin-bottom:.25rem}
+.up-banner p{font-size:.78rem;color:var(--dim);line-height:1.5;max-width:400px}
+.btn-up{flex-shrink:0;padding:.6rem 1.3rem;border-radius:8px;background:var(--cyan);color:var(--bg);font-family:var(--display);font-size:.78rem;font-weight:800;text-decoration:none;white-space:nowrap;box-shadow:0 0 20px rgba(0,229,255,.22);transition:transform .15s}
+.btn-up:hover{transform:translateY(-2px)}
+
+/* ─── CHECKLIST ─── */
+.cklist{background:var(--s2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:1.2rem}
+.ck-row{display:flex;align-items:flex-start;gap:.8rem;padding:.85rem 1.1rem;cursor:pointer;transition:background .15s;border-bottom:1px solid var(--border)}
+.ck-row:last-child{border-bottom:none}
+.ck-row:hover{background:var(--s3)}
+.ck-box{width:19px;height:19px;flex-shrink:0;margin-top:.05rem;border-radius:5px;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:.72rem;transition:all .18s}
+.ck-row.ticked .ck-box{background:var(--green);border-color:var(--green);color:var(--bg)}
+.ck-row.ticked .ck-txt{text-decoration:line-through;color:var(--dimmer)}
+.ck-txt{font-size:.83rem;color:var(--white);line-height:1.5}
+.ck-txt strong{color:var(--yellow)}
+
+/* ─── PRICE TABLE ─── */
+.price-mini{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin:.8rem 0}
+.pm-card{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:.8rem}
+.pm-lbl{font-size:.68rem;color:var(--dim);margin-bottom:.2rem}
+.pm-val{font-family:var(--mono);font-size:.95rem;color:var(--green);font-weight:500}
+
+/* ─── FAQ ─── */
+.faq-card{background:var(--s2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:.4rem}
+.faq-q{width:100%;text-align:left;background:none;border:none;color:var(--white);font-family:var(--font);font-size:.85rem;font-weight:600;padding:.95rem 1.1rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap.5rem;transition:color .15s}
+.faq-q:hover{color:var(--cyan)}
+.faq-ico{color:var(--dim);transition:transform .22s;flex-shrink:0}
+.faq-card.open .faq-ico{transform:rotate(45deg);color:var(--cyan)}
+.faq-a{max-height:0;overflow:hidden;font-size:.8rem;color:var(--dim);line-height:1.65;transition:max-height .28s,padding .28s;padding:0 1.1rem}
+.faq-card.open .faq-a{max-height:160px;padding:.1rem 1.1rem .95rem}
+
+/* ─── MOBILE ─── */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .how-grid{grid-template-columns:1fr}
+  .nicho-grid{grid-template-columns:repeat(2,1fr)}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .content{padding:1rem}
+  .topbar{padding:0 1rem}
+  .up-banner{flex-direction:column}
+  .price-mini{grid-template-columns:1fr 1fr}
+}
+@media(max-width:420px){
+  .stats-row{grid-template-columns:1fr}
+  .price-mini{grid-template-columns:1fr}
+  .nicho-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-logo">AF<br>IA</div>
+  <div class="sb-sep"></div>
+  <button class="sb-btn active" id="sb-home" onclick="goto('home')">🏠<span class="sb-tip">Início</span></button>
+  <button class="sb-btn" id="sb-metodo" onclick="goto('metodo')">🔧<span class="sb-tip">Passo 1 — Método</span></button>
+  <button class="sb-btn" id="sb-nicho" onclick="goto('nicho')">🗺️<span class="sb-tip">Passo 2 — Nicho</span></button>
+  <button class="sb-btn" id="sb-scripts" onclick="goto('scripts')">📝<span class="sb-tip">Passo 3 — Scripts</span></button>
+  <button class="sb-btn" id="sb-checklist" onclick="goto('checklist')">✅<span class="sb-tip">Passos 4&5 — Reunião</span></button>
+  <button class="sb-btn" id="sb-faq" onclick="goto('faq')">💬<span class="sb-tip">Dúvidas</span></button>
+  <div class="sb-spacer"></div>
+  <div class="sb-avatar" id="sb-av">JO</div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="page-title" id="pg-title">Início</span>
+      <span class="plan-chip chip-free" id="plan-chip">GRATUITO</span>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-user">Olá, <strong id="tb-name">João</strong> 👋</span>
+      <button class="notif-btn">🔔</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ████ HOME ████ -->
+    <div class="screen active" id="screen-home">
+
+      <div class="welcome-hero">
+        <div class="wh-tag"><span class="pulse"></span>Área liberada</div>
+        <h1>Olá, <em id="h-name">João</em>! Hora de começar. 💸</h1>
+        <p>Siga os <strong style="color:var(--white)">5 passos na ordem.</strong> Cada um tem instruções claras e leva menos de 1 hora. Feito para quem tem pouco tempo.</p>
+        <button class="wh-cta" onclick="goto('metodo')">Começar — Passo 1 →</button>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Progresso geral</div>
+          <div class="stat-val" id="stat-pct">0%</div>
+          <div class="stat-sub" id="stat-sub">0 de 5 passos feitos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Próximo passo</div>
+          <div class="stat-val" style="font-size:1rem;padding-top:.3rem" id="stat-next">Passo 1</div>
+          <div class="stat-sub">Configure a automação</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Meta: 1º cliente</div>
+          <div class="stat-val" style="color:var(--yellow)">21dias</div>
+          <div class="stat-sub">seguindo a jornada</div>
+        </div>
+      </div>
+
+      <div class="tracker">
+        <div class="tracker-hd">
+          <h2>🗺️ Jornada completa — 5 passos</h2>
+          <span class="tracker-pct" id="tracker-pct">0 / 5</span>
+        </div>
+        <div class="tbar"><div class="tbar-fill" id="tbar-fill" style="width:0%"></div></div>
+        <div class="step-rows">
+          <div class="step-item current" id="si1" onclick="goto('metodo')">
+            <div class="s-ico">🔧</div>
+            <div class="s-info"><h3>Configure sua primeira automação</h3><p>Método WhatsApp Reativador — zero programação, resultado em 48h</p></div>
+            <span class="s-badge sb-now">AGORA</span>
+          </div>
+          <div class="step-item locked" id="si2">
+            <div class="s-ico">🗺️</div>
+            <div class="s-info"><h3>Escolha seu nicho</h3><p>Salão, clínica, restaurante — onde tem mais clientes na sua cidade</p></div>
+            <span class="s-badge sb-lock">🔒</span>
+          </div>
+          <div class="step-item locked" id="si3">
+            <div class="s-ico">📝</div>
+            <div class="s-info"><h3>Copie o script e prospecte</h3><p>Envie para 10 negócios hoje — 3 em cada 10 respondem</p></div>
+            <span class="s-badge sb-lock">🔒</span>
+          </div>
+          <div class="step-item locked" id="si4">
+            <div class="s-ico">💼</div>
+            <div class="s-info"><h3>Faça a reunião de 15 minutos</h3><p>Roteiro pronto + frase exata para fechar o contrato</p></div>
+            <span class="s-badge sb-lock">🔒</span>
+          </div>
+          <div class="step-item locked" id="si5">
+            <div class="s-ico">💰</div>
+            <div class="s-info"><h3>Receba e escale</h3><p>Como cobrar, renovar e conquistar o 2º e 3º cliente</p></div>
+            <span class="s-badge sb-lock">🔒</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ████ PASSO 1 — MÉTODO ████ -->
+    <div class="screen" id="screen-metodo">
+      <div class="mhero c1">
+        <div class="mhero-top"><span class="mhero-step">PASSO 1 DE 5</span><span class="mhero-time">⏱ ~45 min</span></div>
+        <h2>Configure o WhatsApp Reativador</h2>
+        <p>Todo negócio tem clientes sumidos. Você vai montar uma sequência automática de 3 mensagens que os traz de volta. <strong style="color:var(--white)">Sem código.</strong> Setup em uma tarde, resultado em 48h.</p>
+        <div class="tools-row">
+          <div class="tool-tag"><span class="tool-dot"></span>ManyChat (grátis)</div>
+          <div class="tool-tag"><span class="tool-dot"></span>WhatsApp Business</div>
+          <div class="tool-tag"><span class="tool-dot"></span>Make (grátis)</div>
+        </div>
+      </div>
+
+      <div class="sec-lbl">Como fazer — 4 etapas</div>
+      <div class="how-grid">
+        <div class="how-card"><div class="how-n">01</div><h4>📋 Peça a lista de clientes</h4><p>Contatos que não voltaram há 60+ dias. Planilha, print ou exportação do sistema. A maioria dos donos tem isso no celular.</p><span class="how-t">⏱ 5 min</span></div>
+        <div class="how-card"><div class="how-n">02</div><h4>⚙️ Monte o fluxo no ManyChat</h4><p>3 mensagens ao longo de 7 dias: (1) lembrete afetivo, (2) oferta exclusiva, (3) urgência. Visual, arraste e solte, plano gratuito suficiente.</p><span class="how-t">⏱ 30 min</span></div>
+        <div class="how-card"><div class="how-n">03</div><h4>🔗 Adicione link de agendamento</h4><p>Botão na mensagem que leva ao Calendly ou Google Agenda do cliente. O cliente agenda sozinho, sem ligação.</p><span class="how-t">⏱ 10 min</span></div>
+        <div class="how-card"><div class="how-n">04</div><h4>📊 Mostre o resultado</h4><p>Em 15 dias: print de quantas mensagens foram enviadas, quantos responderam e quantos agendaram. Esse número fecha o contrato.</p><span class="how-t">⏱ 5 min</span></div>
+      </div>
+
+      <div class="sec-lbl">Mensagem 1 de 3 — copie agora</div>
+      <div class="script-wrap">
+        <div class="script-bar">
+          <div style="display:flex;align-items:center;gap:.4rem">
+            <div class="script-dots"><div class="sdot" style="background:#FF5F57"></div><div class="sdot" style="background:#FEBC2E"></div><div class="sdot" style="background:#28C840"></div></div>
+            <span class="script-bar-title">WhatsApp · Dia 1 de 7</span>
+          </div>
+          <button class="btn-copy" onclick="cp(this,'m1')">📋 Copiar</button>
+        </div>
+        <div class="script-body" id="m1">Olá, <mark>[NOME DO CLIENTE]</mark>! 😊
+
+Tô passando pra dar um oi e saber se tá tudo bem com você.
+
+Faz um tempinho que a gente não se vê por aqui no <mark>[NOME DO NEGÓCIO]</mark> e a gente sentiu sua falta! 💛
+
+A <mark>[NOME DO DONO]</mark> me pediu pra avisar que tem uma novidade esperando por você.
+
+Posso te contar mais? É rapidinho! 🙏</div>
+      </div>
+
+      <div class="action-bar">
+        <div class="ab-info"><h4>✅ Configurou e testou a automação?</h4><p>Marque como feito para desbloquear o Passo 2</p></div>
+        <div class="ab-btns">
+          <button class="btn-s" onclick="goto('home')">← Início</button>
+          <button class="btn-p" onclick="done(1)">Feito! Escolher nicho →</button>
+        </div>
+      </div>
+
+      <div class="up-banner">
+        <div><h3>🔒 7 métodos extras no Starter</h3><p>Bot IA 24/7, Funil de Instagram, Recuperação de Carrinho e mais 4 — desbloqueiam com o plano Starter por R$297 único.</p></div>
+        <a href="autoflow-ia.html#servicos" class="btn-up">Ver planos →</a>
+      </div>
+    </div>
+
+    <!-- ████ PASSO 2 — NICHO ████ -->
+    <div class="screen" id="screen-nicho">
+      <div class="mhero c2">
+        <div class="mhero-top"><span class="mhero-step">PASSO 2 DE 5</span><span class="mhero-time">⏱ ~5 min</span></div>
+        <h2>Escolha seu nicho agora</h2>
+        <p>Não pense demais. Escolha o segmento com <strong style="color:var(--white)">mais negócios na sua cidade</strong> ou que você conhece melhor. Você pode mudar depois.</p>
+      </div>
+
+      <div id="nicho-lock" style="display:none">
+        <div class="lock-wall"><div class="lock-ico">🔒</div><h3>Conclua o Passo 1 primeiro</h3><p>Configure a automação antes de escolher o nicho.</p><button class="btn-p" onclick="goto('metodo')">← Ir para Passo 1</button></div>
+      </div>
+
+      <div id="nicho-content">
+        <div class="sec-lbl">Clique no seu nicho — escolha 1</div>
+        <div class="nicho-grid">
+          <div class="nicho-btn" onclick="pickNicho(this,'salao')"><span class="ni-em">💇</span><div class="ni-nm">Salão de Beleza</div><div class="ni-tk">R$700–1.200/mês</div></div>
+          <div class="nicho-btn" onclick="pickNicho(this,'clinica')"><span class="ni-em">💆</span><div class="ni-nm">Clínica Estética</div><div class="ni-tk">R$900–1.500/mês</div></div>
+          <div class="nicho-btn" onclick="pickNicho(this,'nutri')"><span class="ni-em">🥗</span><div class="ni-nm">Nutricionista</div><div class="ni-tk">R$800–1.400/mês</div></div>
+          <div class="nicho-btn" onclick="pickNicho(this,'restaurante')"><span class="ni-em">🍕</span><div class="ni-nm">Restaurante</div><div class="ni-tk">R$600–1.000/mês</div></div>
+          <div class="nicho-btn" onclick="pickNicho(this,'pet')"><span class="ni-em">🐾</span><div class="ni-nm">Petshop / Vet</div><div class="ni-tk">R$500–900/mês</div></div>
+          <div class="nicho-btn" onclick="pickNicho(this,'academia')"><span class="ni-em">🏋️</span><div class="ni-nm">Academia</div><div class="ni-tk">R$600–1.000/mês</div></div>
+          <div class="nicho-btn" onclick="pickNicho(this,'imobi')"><span class="ni-em">🏠</span><div class="ni-nm">Imobiliária</div><div class="ni-tk">R$1.000–2.000/mês</div></div>
+          <div class="nicho-btn" onclick="pickNicho(this,'loja')"><span class="ni-em">👗</span><div class="ni-nm">Loja de Roupas</div><div class="ni-tk">R$500–800/mês</div></div>
+        </div>
+
+        <div class="action-bar" id="nicho-ab" style="display:none">
+          <div class="ab-info"><h4 id="nicho-chosen">✅ Nicho escolhido!</h4><p>Próximo: pegue o script personalizado para esse segmento</p></div>
+          <div class="ab-btns">
+            <button class="btn-s" onclick="goto('home')">← Início</button>
+            <button class="btn-p" onclick="done(2)">Próximo: script →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ████ PASSO 3 — SCRIPTS ████ -->
+    <div class="screen" id="screen-scripts">
+      <div class="mhero c3">
+        <div class="mhero-top"><span class="mhero-step">PASSO 3 DE 5</span><span class="mhero-time">⏱ ~15 min</span></div>
+        <h2>Copie o script e envie para 10 pessoas</h2>
+        <p>Personalize os campos em <mark style="background:rgba(255,214,0,.15);color:var(--yellow);border-radius:3px;padding:0 .2rem">colchetes</mark> e envie pelo WhatsApp ou Instagram. <strong style="color:var(--white)">Cada 10 mensagens geram ~3 respostas.</strong></p>
+      </div>
+
+      <div id="scripts-lock" style="display:none">
+        <div class="lock-wall"><div class="lock-ico">🔒</div><h3>Conclua os Passos 1 e 2 primeiro</h3><p>Escolha seu nicho antes de pegar o script.</p><button class="btn-p" onclick="goto('nicho')">← Ir para Passo 2</button></div>
+      </div>
+
+      <div id="scripts-content">
+        <div class="sec-lbl">Script de prospecção — <span id="sc-nicho-lbl">Salão de Beleza</span></div>
+        <div class="script-wrap">
+          <div class="script-bar">
+            <div style="display:flex;align-items:center;gap:.4rem">
+              <div class="script-dots"><div class="sdot" style="background:#FF5F57"></div><div class="sdot" style="background:#FEBC2E"></div><div class="sdot" style="background:#28C840"></div></div>
+              <span class="script-bar-title">1ª mensagem — WhatsApp / Instagram DM</span>
+            </div>
+            <button class="btn-copy" onclick="cp(this,'sc-main')">📋 Copiar</button>
+          </div>
+          <div class="script-body" id="sc-main">Oi, <mark>[NOME DO DONO]</mark>! Tudo bem?
+
+Vi o <mark>[NOME DO NEGÓCIO]</mark> aqui perto e fiquei curioso(a).
+
+Trabalho com automação de atendimento — faço o WhatsApp do seu negócio responder clientes, confirmar agendamentos e reativar quem sumiu, de forma automática.
+
+Um negócio aqui em <mark>[CIDADE]</mark> aumentou o faturamento em R$3.800 no primeiro mês só com isso.
+
+Você teria 10 minutinhos essa semana pra eu mostrar como funcionaria no seu caso? Sem compromisso! 😊</div>
+        </div>
+
+        <div class="sec-lbl">Se responder "não preciso" ou "tá caro"</div>
+        <div class="script-wrap">
+          <div class="script-bar">
+            <div style="display:flex;align-items:center;gap:.4rem">
+              <div class="script-dots"><div class="sdot" style="background:#FF5F57"></div><div class="sdot" style="background:#FEBC2E"></div><div class="sdot" style="background:#28C840"></div></div>
+              <span class="script-bar-title">Resposta para objeção</span>
+            </div>
+            <button class="btn-copy" onclick="cp(this,'sc-obj')">📋 Copiar</button>
+          </div>
+          <div class="script-body" id="sc-obj">Entendo! 😊
+
+Se eu mostrasse que isso vai gerar pelo menos R$2.000 a mais por mês, ainda pareceria desnecessário?
+
+A maioria dos meus clientes recupera o valor do serviço na primeira semana.
+
+Que tal eu fazer uma demonstração gratuita de 15 dias no seu negócio, sem custo? Você vê o resultado antes de decidir qualquer coisa.</div>
+        </div>
+
+        <div class="action-bar">
+          <div class="ab-info"><h4>📱 Enviou para pelo menos 10 pessoas?</h4><p>Marque como feito quando tiver prospectado 10+ contatos hoje</p></div>
+          <div class="ab-btns">
+            <button class="btn-s" onclick="goto('nicho')">← Passo 2</button>
+            <button class="btn-p" onclick="done(3)">Enviei! Próximo →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ████ PASSOS 4 & 5 — REUNIÃO ████ -->
+    <div class="screen" id="screen-checklist">
+      <div class="mhero c4">
+        <div class="mhero-top"><span class="mhero-step">PASSOS 4 E 5</span><span class="mhero-time">⏱ Reunião de 15 min</span></div>
+        <h2>Roteiro da reunião e fechamento</h2>
+        <p>Alguém respondeu? Ótimo. Siga esse roteiro <strong style="color:var(--white)">passo a passo</strong> durante a conversa e feche o contrato na mesma sessão.</p>
+      </div>
+
+      <div id="ck-lock" style="display:none">
+        <div class="lock-wall"><div class="lock-ico">🔒</div><h3>Conclua os Passos 1, 2 e 3 primeiro</h3><p>Você precisa ter prospectado antes de ter uma reunião.</p><button class="btn-p" onclick="goto('scripts')">← Ir para Passo 3</button></div>
+      </div>
+
+      <div id="ck-content">
+        <div class="sec-lbl">Roteiro da reunião — marque conforme faz</div>
+        <div class="cklist">
+          <div class="ck-row" onclick="tick(this)"><div class="ck-box"></div><div class="ck-txt"><strong>Min 0–3 · Apresentação:</strong> "Automatizo o atendimento de negócios como o seu usando IA — sem mudar sua rotina"</div></div>
+          <div class="ck-row" onclick="tick(this)"><div class="ck-box"></div><div class="ck-txt"><strong>Min 3–7 · Pergunte a dor:</strong> "Quantas mensagens você responde por dia? Quantos clientes somem sem avisar?" — só ouça</div></div>
+          <div class="ck-row" onclick="tick(this)"><div class="ck-box"></div><div class="ck-txt"><strong>Min 7–11 · Mostre resultado:</strong> "Um negócio igual ao seu reativou 28 clientes sumidos e faturou R$3.800 a mais em 30 dias"</div></div>
+          <div class="ck-row" onclick="tick(this)"><div class="ck-box"></div><div class="ck-txt"><strong>Min 11–13 · Apresente o valor:</strong> "O investimento é R$[SEU PREÇO]/mês — menos de 10% do que o sistema vai gerar pra você"</div></div>
+          <div class="ck-row" onclick="tick(this)"><div class="ck-box"></div><div class="ck-txt"><strong>Min 13–15 · Feche:</strong> "Faz sentido pra você? Posso preparar o contrato ainda hoje e a gente começa essa semana?"</div></div>
+        </div>
+
+        <div class="sec-lbl">Quanto cobrar — referência rápida</div>
+        <div style="background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:1.1rem;margin-bottom:1.2rem">
+          <p style="font-size:.8rem;color:var(--dim);line-height:1.65;margin-bottom:.8rem">Regra de ouro: <strong style="color:var(--white)">calcule o ROI que vai gerar e cobre 10% disso.</strong> Se vai gerar R$6k/mês → cobre R$600/mês.</p>
+          <div class="price-mini">
+            <div class="pm-card"><div class="pm-lbl">Salão / Clínica</div><div class="pm-val">R$700–900/mês</div></div>
+            <div class="pm-card"><div class="pm-lbl">Restaurante</div><div class="pm-val">R$600–800/mês</div></div>
+            <div class="pm-card"><div class="pm-lbl">Nutricionista</div><div class="pm-val">R$800–1.100/mês</div></div>
+            <div class="pm-card"><div class="pm-lbl">Imobiliária</div><div class="pm-val">R$1.200–2.000/mês</div></div>
+          </div>
+        </div>
+
+        <div class="sec-lbl">Frase exata para fechar o contrato</div>
+        <div class="script-wrap">
+          <div class="script-bar">
+            <div style="display:flex;align-items:center;gap:.4rem">
+              <div class="script-dots"><div class="sdot" style="background:#FF5F57"></div><div class="sdot" style="background:#FEBC2E"></div><div class="sdot" style="background:#28C840"></div></div>
+              <span class="script-bar-title">Fale na reunião</span>
+            </div>
+            <button class="btn-copy" onclick="cp(this,'sc-close')">📋 Copiar</button>
+          </div>
+          <div class="script-body" id="sc-close">Ótimo! Então fica assim:
+
+Eu configuro tudo essa semana, a gente faz um teste de 15 dias gratuito pra você ver o resultado antes de qualquer pagamento.
+
+Se você gostar — e eu tenho certeza que vai — a gente assina um contrato simples de 3 meses por R$<mark>[VALOR]</mark>/mês.
+
+Posso te mandar o contrato agora pelo WhatsApp pra você assinar digital?</div>
+        </div>
+
+        <div class="action-bar">
+          <div class="ab-info"><h4>🎉 Fechou o primeiro cliente?</h4><p>Marque como feito — você completou a jornada!</p></div>
+          <div class="ab-btns">
+            <button class="btn-s" onclick="goto('scripts')">← Passo 3</button>
+            <button class="btn-p" onclick="done(4);done(5)">🏆 Fechei o cliente!</button>
+          </div>
+        </div>
+
+        <div class="up-banner">
+          <div><h3>📄 Contrato jurídico + Proposta profissional</h3><p>No Plano Pro você recebe o contrato revisado por advogado e o template de proposta. Nunca improvise.</p></div>
+          <a href="autoflow-ia.html#servicos" class="btn-up">Quero o Pro →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ████ FAQ ████ -->
+    <div class="screen" id="screen-faq">
+      <div style="margin-bottom:1.2rem">
+        <h2 style="font-family:var(--display);font-size:1.2rem;font-weight:800;color:var(--white);margin-bottom:.3rem">💬 Dúvidas frequentes</h2>
+        <p style="font-size:.82rem;color:var(--dim)">O que todo CLT pergunta antes de fechar o primeiro cliente.</p>
+      </div>
+
+      <div class="faq-card"><button class="faq-q" onclick="openFaq(this)">Preciso saber programar?<span class="faq-ico">+</span></button><div class="faq-a">Não. ManyChat e Make são visuais — você arrasta blocos. Se sabe usar WhatsApp, aprende em uma tarde.</div></div>
+      <div class="faq-card"><button class="faq-q" onclick="openFaq(this)">Quanto tempo por semana?<span class="faq-ico">+</span></button><div class="faq-a">Fase de aprendizado: 1–2h por dia por 1 semana. Depois: cada cliente exige ~2–4h por mês de manutenção. Compatível com CLT de período integral.</div></div>
+      <div class="faq-card"><button class="faq-q" onclick="openFaq(this)">E se ninguém responder meu script?<span class="faq-ico">+</span></button><div class="faq-a">Normal no início. Média: 3 respostas para cada 10 mensagens. Envie para mais pessoas — volume resolve. Com 30 contatos você terá 6–9 interessados.</div></div>
+      <div class="faq-card"><button class="faq-q" onclick="openFaq(this)">Preciso de CNPJ?<span class="faq-ico">+</span></button><div class="faq-a">Não no começo. Comece como pessoa física. Quando passar de R$2.000/mês, abra MEI pelo Gov.br (10 minutos, gratuito). Paga ~R$70/mês de imposto.</div></div>
+      <div class="faq-card"><button class="faq-q" onclick="openFaq(this)">Posso fazer em cidade pequena?<span class="faq-ico">+</span></button><div class="faq-a">Sim — cidades menores têm vantagem: menos concorrência. Com 50 mil habitantes já existem dezenas de salões, clínicas e restaurantes sem automação.</div></div>
+      <div class="faq-card"><button class="faq-q" onclick="openFaq(this)">E se o cliente quiser cancelar?<span class="faq-ico">+</span></button><div class="faq-a">Contrato mínimo de 3 meses. Na prática 89% renovam — quando alguém quiser cancelar, mostre o relatório de clientes reativados. Isso resolve.</div></div>
+
+      <div class="up-banner">
+        <div><h3>🎯 Mentoria ao vivo toda semana</h3><p>No Plano Pro você entra nas sessões semanais onde tiramos dúvidas em tempo real e revisamos propostas juntos.</p></div>
+        <a href="autoflow-ia.html#servicos" class="btn-up">Quero o Pro →</a>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<script>
+/* ── INIT ── */
+const p = new URLSearchParams(location.search);
+const nome = p.get('nome') || 'João';
+const sob  = p.get('sobrenome') || 'Silva';
+const plano= p.get('plano') || 'free';
+
+document.getElementById('h-name').textContent  = nome;
+document.getElementById('tb-name').textContent = nome;
+document.getElementById('sb-av').textContent   = (nome[0]+(sob[0]||'S')).toUpperCase();
+
+const plabels = {free:'GRATUITO',starter:'STARTER',pro:'PRO',elite:'ELITE'};
+const pclass  = {free:'chip-free',starter:'chip-starter',pro:'chip-pro',elite:'chip-elite'};
+const chip = document.getElementById('plan-chip');
+chip.textContent = plabels[plano]||'GRATUITO';
+chip.className   = 'plan-chip '+(pclass[plano]||'chip-free');
+
+/* ── STATE ── */
+const KEY = 'afsteps_'+nome;
+let ST = JSON.parse(localStorage.getItem(KEY)||'{}');
+function save(){ localStorage.setItem(KEY,JSON.stringify(ST)); }
+
+/* ── DONE ── */
+function done(n){
+  ST[n]=true; save(); refresh();
+  const nxt={1:'nicho',2:'scripts',3:'checklist',4:'checklist',5:'home'};
+  if(nxt[n]) goto(nxt[n]);
+}
+
+/* ── REFRESH UI ── */
+function refresh(){
+  const cnt = Object.values(ST).filter(Boolean).length;
+  const pct = Math.round((cnt/5)*100);
+  document.getElementById('tbar-fill').style.width=pct+'%';
+  document.getElementById('tracker-pct').textContent=cnt+' / 5';
+  document.getElementById('stat-pct').textContent=pct+'%';
+  document.getElementById('stat-sub').textContent=cnt+' de 5 passos feitos';
+  const nl={0:'Passo 1',1:'Passo 2',2:'Passo 3',3:'Passo 4',4:'Passo 5',5:'🏆 Completo!'};
+  document.getElementById('stat-next').textContent=nl[cnt]||'Completo!';
+
+  const screens_map=['si1','si2','si3','si4','si5'];
+  const screen_ids =['metodo','nicho','scripts','checklist','checklist'];
+  screens_map.forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    const bd=el.querySelector('.s-badge');
+    if(ST[i+1]){
+      el.className='step-item done';
+      el.onclick=null; el.style.pointerEvents='none';
+      if(bd){bd.textContent='✓ FEITO';bd.className='s-badge sb-done';}
+    } else if(i>0 && !ST[i]){
+      el.className='step-item locked';
+      el.style.pointerEvents='none';
+      if(bd){bd.textContent='🔒';bd.className='s-badge sb-lock';}
+    } else {
+      el.className='step-item current';
+      el.style.pointerEvents='';
+      const sid=screen_ids[i];
+      el.onclick=()=>goto(sid);
+      if(bd){bd.textContent='AGORA';bd.className='s-badge sb-now';}
+    }
+  });
+
+  // lock walls
+  const lN=document.getElementById('nicho-lock'),cN=document.getElementById('nicho-content');
+  if(lN&&cN){const l=!ST[1];lN.style.display=l?'block':'none';cN.style.display=l?'none':'block';}
+  const lS=document.getElementById('scripts-lock'),cS=document.getElementById('scripts-content');
+  if(lS&&cS){const l=!ST[1]||!ST[2];lS.style.display=l?'block':'none';cS.style.display=l?'none':'block';}
+  const lC=document.getElementById('ck-lock'),cC=document.getElementById('ck-content');
+  if(lC&&cC){const l=!ST[1]||!ST[2]||!ST[3];lC.style.display=l?'block':'none';cC.style.display=l?'none':'block';}
+}
+
+/* ── NAVIGATION ── */
+const SC={home:'screen-home',metodo:'screen-metodo',nicho:'screen-nicho',scripts:'screen-scripts',checklist:'screen-checklist',faq:'screen-faq'};
+const SB={home:'sb-home',metodo:'sb-metodo',nicho:'sb-nicho',scripts:'sb-scripts',checklist:'sb-checklist',faq:'sb-faq'};
+const TT={home:'Início',metodo:'Passo 1 — Configurar Automação',nicho:'Passo 2 — Escolher Nicho',scripts:'Passo 3 — Scripts de Prospecção',checklist:'Passos 4 & 5 — Reunião e Fechamento',faq:'Dúvidas Frequentes'};
+
+function goto(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
+  const sc=document.getElementById(SC[id]);
+  if(sc)sc.classList.add('active');
+  const sb=document.getElementById(SB[id]);
+  if(sb)sb.classList.add('active');
+  document.getElementById('pg-title').textContent=TT[id]||id;
+  document.querySelector('.content').scrollTop=0;
+}
+
+/* ── NICHO ── */
+const nichoData={
+  salao:    {label:'Salão de Beleza',    txt:'Oi, <mark>[NOME DO DONO]</mark>! Tudo bem?\n\nVi o <mark>[NOME DO SALÃO]</mark> aqui perto e fiquei curioso(a).\n\nTrabalho com automação de atendimento pra salões — o WhatsApp responde clientes, confirma agendamentos e reativa quem sumiu, de forma automática.\n\nUm salão aqui em <mark>[CIDADE]</mark> aumentou o faturamento em R$3.800 no primeiro mês só com isso.\n\nVocê teria 10 minutinhos essa semana pra eu mostrar como funcionaria no seu salão? Sem compromisso! 😊'},
+  clinica:  {label:'Clínica Estética',   txt:'Oi, <mark>[NOME DO DONO]</mark>! Tudo bem?\n\nVi a <mark>[NOME DA CLÍNICA]</mark> e achei incrível o trabalho de vocês!\n\nTrabalho com automação pra clínicas — agendamento automático, confirmação pelo WhatsApp e reativação de clientes sumidos.\n\nUma clínica em <mark>[CIDADE]</mark> reduziu 78% das faltas e faturou R$5.200 a mais no primeiro mês.\n\nVocê teria 10 minutinhos essa semana? Sem compromisso! 😊'},
+  nutri:    {label:'Nutricionista',      txt:'Olá, <mark>[NOME]</mark>! 😊\n\nEncontrei seu contato pesquisando nutricionistas em <mark>[CIDADE]</mark>.\n\nTrabalho com automação pra profissionais de saúde — o assistente responde dúvidas, envia a ficha de anamnese e agenda a consulta, tudo pelo WhatsApp.\n\nResultado: menos tempo no celular, mais tempo atendendo pacientes.\n\nPosso te enviar um vídeo de 2 min mostrando como funciona? Sem obrigação! 🙏'},
+  restaurante:{label:'Restaurante',      txt:'Oi, <mark>[NOME]</mark>! 👋\n\nVi que o <mark>[NOME DO RESTAURANTE]</mark> faz delivery — vocês devem receber muitos pedidos pelo WhatsApp?\n\nTrabalho com automação pra restaurantes: cardápio interativo, pedidos automáticos e recuperação de quem viu o cardápio mas não pediu.\n\nUm cliente meu recuperou R$6.200 em pedidos perdidos no primeiro mês.\n\nPosso te mostrar em 15 minutos como funcionaria aqui?'},
+  pet:      {label:'Petshop / Vet',      txt:'Oi, <mark>[NOME]</mark>! 🐾\n\nVi o <mark>[NOME DO PETSHOP]</mark> aqui e adorei!\n\nTrabalho com automação pra petshops — lembretes de vacina e banho pelo WhatsApp, confirmação de agendamentos e reativação de clientes sumidos.\n\nUm petshop em <mark>[CIDADE]</mark> aumentou em 40% o retorno dos clientes com isso.\n\nVocê teria 10 minutinhos essa semana? 😊'},
+  academia: {label:'Academia / Personal', txt:'Oi, <mark>[NOME]</mark>! 💪\n\nVi a <mark>[NOME DA ACADEMIA]</mark> e achei incrível!\n\nTrabalho com automação pra academias — onboarding de alunos, lembretes de treino pelo WhatsApp e renovação de matrícula automática.\n\nUma academia em <mark>[CIDADE]</mark> reduziu 60% das inadimplências com isso.\n\nVocê teria 15 minutinhos essa semana? Sem compromisso! 😊'},
+  imobi:    {label:'Imobiliária',        txt:'Oi, <mark>[NOME]</mark>! 🏠\n\nVi a <mark>[NOME DA IMOBILIÁRIA]</mark> aqui perto.\n\nTrabalho com automação de leads pra imobiliárias — o sistema qualifica automaticamente quem pede informação, envia imóveis personalizados e faz follow-up inteligente.\n\nUma imobiliária em <mark>[CIDADE]</mark> aumentou 35% a conversão de leads em visitas.\n\nVocê teria 15 minutinhos essa semana? 😊'},
+  loja:     {label:'Loja de Roupas',     txt:'Oi, <mark>[NOME]</mark>! 👗\n\nVi a <mark>[NOME DA LOJA]</mark> aqui e adorei as peças!\n\nTrabalho com automação pra lojas — catálogo interativo pelo WhatsApp, campanhas automáticas de lançamento e recuperação de quem perguntou mas não comprou.\n\nUma loja em <mark>[CIDADE]</mark> faturou R$4.100 a mais no primeiro mês só com o catálogo automatizado.\n\nVocê teria 10 minutinhos essa semana? Sem compromisso! 😊'},
+};
+let selNicho='salao';
+
+function pickNicho(el,key){
+  document.querySelectorAll('.nicho-btn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+  selNicho=key;
+  const d=nichoData[key];
+  document.getElementById('nicho-ab').style.display='flex';
+  document.getElementById('nicho-chosen').textContent='✅ Nicho: '+d.label;
+  document.getElementById('sc-nicho-lbl').textContent=d.label;
+  document.getElementById('sc-main').innerHTML=d.txt;
+}
+
+/* ── COPY ── */
+function cp(btn,id){
+  const el=document.getElementById(id);
+  const txt=el?el.innerText:'';
+  navigator.clipboard.writeText(txt).then(()=>{
+    btn.textContent='✅ Copiado!';btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent='📋 Copiar';btn.classList.remove('ok');},2400);
+  }).catch(()=>{btn.textContent='⚠️ Erro';setTimeout(()=>{btn.textContent='📋 Copiar';},2000);});
+}
+
+/* ── CHECKLIST TICK ── */
+function tick(row){
+  row.classList.toggle('ticked');
+  row.querySelector('.ck-box').textContent=row.classList.contains('ticked')?'✓':'';
+}
+
+/* ── FAQ ── */
+function openFaq(btn){
+  const card=btn.parentElement;
+  const was=card.classList.contains('open');
+  document.querySelectorAll('.faq-card').forEach(c=>c.classList.remove('open'));
+  if(!was)card.classList.add('open');
+}
+
+/* ── LOAD ── */
+window.addEventListener('load',()=>{
+  refresh();
+  setTimeout(()=>{ document.getElementById('tbar-fill').style.transition='width 1s ease'; },100);
+});
+</script>
+</body>
+</html>
